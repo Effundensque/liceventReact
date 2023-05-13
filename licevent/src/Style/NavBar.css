@@ -1,0 +1,14 @@
+#watafac{
+  background-color:#C6878F;
+  border-color: #663B46;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+}
+
+.navbar-nav.mx-auto {
+  margin: 0 auto;
+}
+
+.ml-auto {
+  margin-left: auto !important;
+}

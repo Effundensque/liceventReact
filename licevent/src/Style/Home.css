@@ -1,0 +1,8 @@
+.invitation {
+    text-align: center;
+    font-size: 750%;
+    color: #c6878f;
+    /* border: 1px solid black; */
+    text-shadow: 5px 1px 0px #000, -1px -1px 0px #000, 1px -1px 0px #000, -1px 1px 0px #000;
+    margin-top: 50px;
+  }
