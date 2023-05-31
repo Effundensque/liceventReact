@@ -61,10 +61,7 @@ function Create() {
     }
     const response = await fetch(`${process.env.REACT_APP_API_URL}/website`, requestOptionsWebsiteAdd)
     const data = await response.json()
-    console.log("Sugi pula:",data.web.id);
     setWebsiteId(data.web.id);
-
-
 
   }
 
