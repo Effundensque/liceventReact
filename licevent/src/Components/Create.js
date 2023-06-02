@@ -47,6 +47,7 @@ function Create() {
         console.log(dataGuests);
         setWebsiteId('');
       }
+      runTerraform(websiteId);
       
     }
     addGuests();
@@ -72,7 +73,30 @@ function Create() {
     }
   }, [isLoggedIn])
 
-
+  const runTerraform = async (websiteId) => {
+  
+    try {
+      const fileResponse = await fetch(`${process.env.REACT_APP_API_URL}/terraform`,{method:'GET'});
+      console.log(fileResponse);
+      var fileData = await fileResponse.text();
+      fileData = fileData.replace("http://localhost:8080", `${process.env.REACT_APP_API_URL}`)
+      fileData = fileData.replace("mamaAreMere",websiteId);
+      console.log(fileData)
+      // Make a POST request to your /terraform endpoint to send the file contents
+      const response2 = await fetch(`${process.env.REACT_APP_API_URL}/terraform`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ terraformCode: fileData })
+      });
+  
+      const data = await response2.json()
+      console.log(data)
+    } catch (err) {
+      console.error(err)
+    }
+  }
 
 
   return (
