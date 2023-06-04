@@ -1,4 +1,3 @@
-import Terraform from "./Terraform";
 import '../Style/Create.css';
 import { Modal } from 'react-bootstrap';
 
@@ -65,7 +64,7 @@ function Create() {
 
     const requestOptionsWebsiteAdd = {
       method: 'POST', headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: websiteName, userId: currentUser.id, description: websiteDescription })
+      body: JSON.stringify({ name: websiteName, userId: currentUser.id, description: websiteDescription, date:websiteDate })
     }
     const response = await fetch(`${process.env.REACT_APP_API_URL}/website`, requestOptionsWebsiteAdd)
     const data = await response.json()
@@ -102,6 +101,7 @@ function Create() {
       const data = await response2.json()
       console.log(data)
       if (data.message == 'Terraform command executed successfully.') {
+        modifyPublicIpWebsite(websiteId,data.publicIp);
         setShowModal(false);
       }
     } catch (err) {
@@ -130,6 +130,25 @@ function Create() {
     setShowModal(false);
   };
 
+  async function modifyPublicIpWebsite(webId, publicIp){
+    var pubIp = publicIp;
+    pubIp = pubIp.replace("\"",'');
+    pubIp = pubIp.replace("\"",'');
+    const requestOptions={
+      method:'PUT',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({websiteId:webId, publicip:pubIp})
+    }
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/website`,requestOptions);
+    const data = await response.json();
+    console.log(data);
+  }
+
+  function ceva(element)
+  {
+    window.location.href = element.publicip
+  }
+
   return (
     <div>
       {isLoggedIn ?
@@ -140,7 +159,7 @@ function Create() {
             <div id='currentWebsitestext'>These are your current websites:</div>
             <div id='websitesDiv' className="list-group">
               {websites.map((element, index) => (
-                <a key={index} href='#' className="list-group-item list-group-item-action">
+                <a key={index} href={`http://${element.publicip}`} className="list-group-item list-group-item-action">
                   {element.name}
                 </a>
               ))}
@@ -155,22 +174,6 @@ function Create() {
             </div>
 
             {/* Modal Loading */}
-            {/* <div className="modal fade show" id="loadingModal" tabIndex="-1" aria-labelledby="loadingModalLabel" aria-hidden='false'>
-              <div className="modal-dialog">
-                <div className="modal-content">
-                  <div className="modal-header">
-                    <h1 className="modal-title fs-5" id="loadingModalLabel">Currently loading</h1>
-                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => setShowModal(false)}></button>
-                  </div>
-                  <div className="modal-body">
-                    <div id='loadingDialog'>
-                      <iframe id='iframe' src="https://giphy.com/embed/3oEjI6SIIHBdRxXI40" width="50" height="50" className="giphy-embed" allowFullScreen></iframe>
-                      <div id='loadingText'>Please wait for the website to be created!</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div> */}
             <div>
               <Modal show={showModal} onHide={handleCloseModal}>
                 <Modal.Header closeButton>
