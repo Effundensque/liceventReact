@@ -21,7 +21,9 @@ function GoogleLoginButton() {
     localStorage.setItem('tokenId', data.token);
     localStorage.setItem('password', data.password);
     console.log("Parola iti este:", data.password);
-    // window.location.replace('/');
+    //TO DO: send email.
+    alert("Parola iti este:" + data.password);
+    window.location.replace('/');
   }
 
   const handleLoginSuccess = (credentialResponse) => {

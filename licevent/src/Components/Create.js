@@ -1,4 +1,6 @@
 import Terraform from "./Terraform";
+import '../Style/Create.css';
+import { Modal } from 'react-bootstrap';
 
 import React, { useEffect, useState } from 'react';
 import GoogleLoginButton from './GoogleLoginButton';
@@ -16,6 +18,9 @@ function Create() {
   const [websiteDescription, setWebsiteDescription] = useState('');
   const [websiteGuests, setWebsiteGuests] = useState('');
   const [websiteId, setWebsiteId] = useState('');
+  const [showModal, setShowModal] = useState(false);
+
+
 
   async function getUser(userToken_p) {
 
@@ -26,35 +31,37 @@ function Create() {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/usersToken`, requestOptions)
     const data = await response.json()
     setCurrentUser(data[0])
+    getWebsitesUserId(data[0].id);
   }
 
 
-  useEffect( () => {
-    if (websiteId)
-    {
-      async function addGuests(){
+  useEffect(() => {
+    if (websiteId) {
+      async function addGuests() {
         const emailAddresses = websiteGuests.split(' ');
         for (const emailP of emailAddresses) {
-           const requestOptionsGuestsAdd =  {
+          const requestOptionsGuestsAdd = {
             method: 'POST',
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: emailP, websiteId: websiteId})
+            body: JSON.stringify({ email: emailP, websiteId: websiteId })
           };
-    
+
           console.log(requestOptionsGuestsAdd);
-          const resp = await fetch (`${process.env.REACT_APP_API_URL}/guests`,requestOptionsGuestsAdd)
-        const dataGuests = await resp.json();
-        console.log(dataGuests);
-        setWebsiteId('');
+          const resp = await fetch(`${process.env.REACT_APP_API_URL}/guests`, requestOptionsGuestsAdd)
+          const dataGuests = await resp.json();
+          console.log(dataGuests);
+          setWebsiteId('');
+        }
+        runTerraform(websiteId);
+
       }
-      runTerraform(websiteId);
-      
-    }
-    addGuests();
+      addGuests();
     }
   }, [websiteId])
 
   async function handleSubmit() {
+
+    setShowModal(true);
 
     const requestOptionsWebsiteAdd = {
       method: 'POST', headers: { "Content-Type": "application/json" },
@@ -70,19 +77,20 @@ function Create() {
   useEffect(() => {
     if (isLoggedIn === 'true') {
       getUser(userToken)
+
     }
   }, [isLoggedIn])
 
   const runTerraform = async (websiteId) => {
-  
+
     try {
-      const fileResponse = await fetch(`${process.env.REACT_APP_API_URL}/terraform`,{method:'GET'});
+
+      const fileResponse = await fetch(`${process.env.REACT_APP_API_URL}/terraform`, { method: 'GET' });
       console.log(fileResponse);
       var fileData = await fileResponse.text();
       fileData = fileData.replace("http://localhost:8080", `${process.env.REACT_APP_API_URL}`)
-      fileData = fileData.replace("mamaAreMere",websiteId);
-      console.log(fileData)
-      // Make a POST request to your /terraform endpoint to send the file contents
+      fileData = fileData.replace("mamaAreMere", websiteId);
+
       const response2 = await fetch(`${process.env.REACT_APP_API_URL}/terraform`, {
         method: 'POST',
         headers: {
@@ -90,27 +98,95 @@ function Create() {
         },
         body: JSON.stringify({ terraformCode: fileData })
       });
-  
+
       const data = await response2.json()
       console.log(data)
+      if (data.message == 'Terraform command executed successfully.') {
+        setShowModal(false);
+      }
     } catch (err) {
       console.error(err)
     }
   }
 
 
+  const [websites, setWebsites] = useState([]);
+  async function getWebsitesUserId(userId) {
+    const requestOptions = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ userId: userId })
+    }
+    const response = await fetch(`${process.env.REACT_APP_API_URL}/getWebsite`, requestOptions);
+    const data = await response.json();
+    console.log("Websites: ", data.website);
+    setWebsites(data.website);
+
+  }
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
+
   return (
     <div>
       {isLoggedIn ?
         (
           <div>
-            Name: {currentUser.name} {currentUser.given_name}
+            <div id='Name'>Hello, {currentUser.name} {currentUser.given_name}</div>
+            {/* Showing the current websites */}
+            <div id='currentWebsitestext'>These are your current websites:</div>
+            <div id='websitesDiv' className="list-group">
+              {websites.map((element, index) => (
+                <a key={index} href='#' className="list-group-item list-group-item-action">
+                  {element.name}
+                </a>
+              ))}
+            </div>
 
             {/* Create button */}
+
             <div className="createButton">
-              <button type="button" className="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#exampleModal">Create</button>
+              Create a new website:
+              <button id='butonCreate' type="button" className="btn btn-outline-dark" data-bs-toggle="modal" data-bs-target="#exampleModal">Create</button>
 
             </div>
+
+            {/* Modal Loading */}
+            {/* <div className="modal fade show" id="loadingModal" tabIndex="-1" aria-labelledby="loadingModalLabel" aria-hidden='false'>
+              <div className="modal-dialog">
+                <div className="modal-content">
+                  <div className="modal-header">
+                    <h1 className="modal-title fs-5" id="loadingModalLabel">Currently loading</h1>
+                    <button type="button" className="btn-close" data-bs-dismiss="modal" aria-label="Close" onClick={() => setShowModal(false)}></button>
+                  </div>
+                  <div className="modal-body">
+                    <div id='loadingDialog'>
+                      <iframe id='iframe' src="https://giphy.com/embed/3oEjI6SIIHBdRxXI40" width="50" height="50" className="giphy-embed" allowFullScreen></iframe>
+                      <div id='loadingText'>Please wait for the website to be created!</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div> */}
+            <div>
+              <Modal show={showModal} onHide={handleCloseModal}>
+                <Modal.Header closeButton>
+                  <Modal.Title>Success! Creating the website...</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                  <div id='loadingDialog'>
+                    <iframe id='iframe' src="https://giphy.com/embed/3oEjI6SIIHBdRxXI40" width="50" height="50" className="giphy-embed" allowFullScreen></iframe>
+                    <div id='loadingText'>Please wait for the website to be created! Do not close this window!</div>
+                    <div> This might take anywhere between 5 to 10 minutes.</div>
+                  </div>
+                </Modal.Body>
+              </Modal>
+            </div>
+
+
             {/* Modal */}
             <div className="modal fade" id="exampleModal" tabIndex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
               <div className="modal-dialog">
@@ -142,7 +218,7 @@ function Create() {
                   </div>
                   <div className="modal-footer">
                     <button type="button" className="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" className="btn btn-dark" onClick={handleSubmit}>Create</button>
+                    <button type="button" className="btn btn-dark" data-bs-dismiss="modal" onClick={handleSubmit}>Create</button>
                   </div>
                 </div>
               </div>

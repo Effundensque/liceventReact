@@ -1,0 +1,44 @@
+#websitesDiv{
+    margin: 0 auto;
+    float:none;
+    width: 50%;
+    text-align: center;
+}
+
+.createButton{
+    margin: 0 auto;
+    float:none;
+    margin-top: 1%;
+    margin-bottom: 2%;
+    width: 50%;
+    text-align: center;
+}
+
+#Name{
+    font-size: x-large;
+    margin: 0 auto;
+    float:none;
+    width: 50%;
+    margin-bottom: 1%;
+    text-align: center;
+}
+
+#currentWebsitestext{
+    font-size: medium;
+    margin: 0 auto;
+    float:none;
+    width: 50%;
+    text-align: center;
+}
+
+#butonCreate{
+    margin-left:1%
+}
+
+#loadingDialog{
+    font-size: medium;
+    margin: 0 auto;
+    float:none;
+    width: 50%;
+    text-align: center;
+}
