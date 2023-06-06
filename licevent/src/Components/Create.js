@@ -89,6 +89,9 @@ function Create() {
       var fileData = await fileResponse.text();
       fileData = fileData.replace("http://localhost:8080", `${process.env.REACT_APP_API_URL}`)
       fileData = fileData.replace("mamaAreMere", websiteId);
+      var websiteNameNoSpaces = websiteName;
+      websiteNameNoSpaces = websiteNameNoSpaces.replaceAll(/\s/g, "");
+      fileData=fileData.replaceAll("invitationWebsite", `${websiteNameNoSpaces}`);
 
       const response2 = await fetch(`${process.env.REACT_APP_API_URL}/terraform`, {
         method: 'POST',
