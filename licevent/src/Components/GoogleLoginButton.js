@@ -18,13 +18,44 @@ function GoogleLoginButton() {
     const response = await fetch(`${process.env.REACT_APP_API_URL}/users`, requestOptions)
     const data = await response.json()
     console.log(data)
+    if (data.message !== 'User already exists')
+    {
+      SendInvitation(email_p,data.password)
+      alert("The information used to login to your organized events was sent on your email.");
+    }
     localStorage.setItem('tokenId', data.token);
     localStorage.setItem('password', data.password);
     console.log("Parola iti este:", data.password);
+    console.log("Recipient email is ", data);
     //TO DO: send email.
-    alert("Parola iti este:" + data.password);
+    
     window.location.replace('/');
   }
+
+  async function SendInvitation(email, passorla) {
+    const emailContent = `
+    You can log into your managed event's websites using the information below:
+    The email is: ${email}
+    The password is: ${passorla}`
+    const emailSubject = `Invitation to event`;
+    try {
+        const response = await fetch(`${process.env.REACT_APP_API_URL}/send-email`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ email: email, emailContent: emailContent, emailSubject: emailSubject })
+        });
+
+        if (response.ok) {
+            console.log('Email sent successfully!');
+        } else {
+            console.log('Failed to send email.');
+        }
+    } catch (error) {
+        console.error('Error:', error);
+    }
+}
 
   const handleLoginSuccess = (credentialResponse) => {
     const credential = credentialResponse.credential;
