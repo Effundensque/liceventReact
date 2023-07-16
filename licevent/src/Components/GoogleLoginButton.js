@@ -104,7 +104,7 @@ function GoogleLoginButton() {
         )
         :
         (
-          <GoogleOAuthProvider clientId="73405800416-d2grsucel9o4p7oq99o0thqesca0uen1.apps.googleusercontent.com">
+          <GoogleOAuthProvider clientId="73405800416-ll71o2bc6d5hhdccu9nm80bq826id4il.apps.googleusercontent.com">
             <GoogleLogin
               onSuccess={handleLoginSuccess}
               onError={handleLoginError}
